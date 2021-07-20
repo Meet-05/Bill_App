@@ -113,7 +113,6 @@ class TransactionDetail extends StatelessWidget {
             ),
             Container(
               padding: EdgeInsets.all(20.0),
-              decoration: BoxDecoration(color: Colors.black12),
               child: Text(
                 '₹ ${transaction.price}',
                 style: ktitleStyle.copyWith(fontSize: 29.0),

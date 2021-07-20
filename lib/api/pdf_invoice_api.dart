@@ -24,7 +24,8 @@ class PdfInvoiceApi {
       footer: (context) => buildFooter(invoice),
     ));
 
-    return PdfApi.saveDocument(name: 'my_invoice.pdf', pdf: pdf);
+    return PdfApi.saveDocument(
+        name: '${DateTime.now().millisecondsSinceEpoch}.pdf', pdf: pdf);
   }
 
   static Widget buildFooter(Invoice invoice) => Column(

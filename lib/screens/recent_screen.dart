@@ -25,10 +25,12 @@ class _RecentScreenState extends State<RecentScreen> {
             margin: EdgeInsets.symmetric(vertical: 10.0, horizontal: 10.0),
             child: TextField(
               style: TextStyle(
-                fontSize: 25.0,
+                fontSize: 20.0,
                 color: Colors.black,
               ),
               decoration: kSearchBar.copyWith(
+                hintText: 'Enter Customer Name',
+                hintStyle: TextStyle(fontSize: 20.0, color: Colors.black),
                 enabledBorder: OutlineInputBorder(
                   borderSide: new BorderSide(color: Colors.white),
                   borderRadius: new BorderRadius.circular(20.7),
@@ -39,7 +41,7 @@ class _RecentScreenState extends State<RecentScreen> {
                 ),
               ),
               onChanged: (value) {
-                searchText = value;
+                searchText = value.toLowerCase();
 
                 setState(() {});
               },
@@ -51,15 +53,19 @@ class _RecentScreenState extends State<RecentScreen> {
               List<Transaction> transactions =
                   box.values.toList().cast<Transaction>();
               transactions = transactions
-                  .where((element) => element.name.contains(searchText))
+                  .where((element) =>
+                      element.name.toLowerCase().contains(searchText))
                   .toList();
+
               print(transactions.length);
               return Expanded(
                   child: ListView.builder(
-                      itemCount: transactions.length,
+                      itemCount:
+                          transactions.length < 25 ? transactions.length : 25,
                       itemBuilder: (context, index) {
                         return TransactionCard(
-                          transaction: transactions[index],
+                          transaction:
+                              transactions[(transactions.length - 1) - index],
                         );
                       }));
             },
@@ -69,63 +75,3 @@ class _RecentScreenState extends State<RecentScreen> {
     )));
   }
 }
-
-// class TransactionCard extends StatelessWidget {
-//   Transaction transaction;
-//   TransactionCard({this.transaction});
-//   @override
-//   Widget build(BuildContext context) {
-//     return GestureDetector(
-//       onTap: () {
-//         Navigator.push(
-//             context,
-//             MaterialPageRoute(
-//                 builder: (context) => TransactionDetail(
-//                       transaction: transaction,
-//                     )));
-//       },
-//       child: Container(
-//         padding: EdgeInsets.all(12.0),
-//         margin: EdgeInsets.all(8.0),
-//         decoration: BoxDecoration(
-//             color: Colors.blue[300],
-//             borderRadius: BorderRadius.all(Radius.circular(20.0))),
-//         child: Column(
-//           children: [
-//             Row(
-//               mainAxisAlignment: MainAxisAlignment.spaceBetween,
-//               children: [
-//                 Text(
-//                   '${transaction.name}',
-//                   style: ktitleStyle.copyWith(
-//                       fontSize: 25.0, color: Colors.black, letterSpacing: 0.3),
-//                 ),
-//                 Container(
-//                     padding: EdgeInsets.all(12.0),
-//                     decoration: BoxDecoration(
-//                         color: Colors.black,
-//                         borderRadius: BorderRadius.all(Radius.circular(12.0))),
-//                     child: Text(
-//                       '₹ ${transaction.price}',
-//                       style: ktitleStyle,
-//                     ))
-//               ],
-//             ),
-//             Row(
-//               children: [
-//                 Icon(Icons.date_range),
-//                 SizedBox(
-//                   width: 20.0,
-//                 ),
-//                 Text('${transaction.time}',
-//                     style: ktitleStyle.copyWith(
-//                       fontSize: 15.0,
-//                     ))
-//               ],
-//             )
-//           ],
-//         ),
-//       ),
-//     );
-//   }
-// }

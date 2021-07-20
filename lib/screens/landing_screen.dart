@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:bill_app/screens/recent_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:bill_app/providers/product_provider.dart';
@@ -19,26 +21,6 @@ class LandingScreen extends StatefulWidget {
 }
 
 class _LandingScreenState extends State<LandingScreen> {
-//  ValueListenableBuilder<Box<Transaction>>(
-//             valueListenable: Boxes.getTransactions().listenable(),
-//             builder: (context, box, _) {
-//               List<Transaction> transactions =
-//                   box.values.toList().cast<Transaction>();
-//               transactions = transactions
-//                   .where((element) => element.name.contains(searchText))
-//                   .toList();
-//               print(transactions.length);
-//               return Expanded(
-//                   child: ListView.builder(
-//                       itemCount: transactions.length,
-//                       itemBuilder: (context, index) {
-//                         return TransactionCard(
-//                           transaction: transactions[index],
-//                         );
-//                       }));
-//             },
-//           )
-
   int calculateSum(List<Transaction> transacionList) {
     int total = 0;
     String formattedDateTime = DateFormat.yMMMMd().format(DateTime.now());
@@ -58,6 +40,12 @@ class _LandingScreenState extends State<LandingScreen> {
   }
 
   @override
+  void dispose() {
+    super.dispose();
+    Hive.close();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: SafeArea(
@@ -65,11 +53,13 @@ class _LandingScreenState extends State<LandingScreen> {
           padding: const EdgeInsets.all(10.0),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.start,
+            // crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                'Todays Earning',
-                style: ktitleStyle,
+              Center(
+                child: Text(
+                  "Today's Earning",
+                  style: ktitleStyle,
+                ),
               ),
               SizedBox(
                 height: 30.0,
@@ -81,63 +71,81 @@ class _LandingScreenState extends State<LandingScreen> {
                     List<Transaction> transactions =
                         box.values.toList().cast<Transaction>();
 
-                    return Text(
-                      transactions.length == 0
-                          ? '₹ 0'
-                          : '₹ ${calculateSum(transactions)}',
-                      style: ktitleStyle.copyWith(fontSize: 36.0),
+                    return Container(
+                      padding: EdgeInsets.all(15.0),
+                      decoration: BoxDecoration(
+                          color: Colors.black87,
+                          borderRadius:
+                              BorderRadius.all(Radius.circular(10.0))),
+                      child: Text(
+                        transactions.length == 0
+                            ? '₹ 0'
+                            : '₹ ${calculateSum(transactions)}',
+                        style: ktitleStyle.copyWith(fontSize: 36.0),
+                      ),
                     );
                   },
                 ),
               ),
-              SizedBox(
-                height: 30.0,
-              ),
-              Text(
-                'Recent Transaction',
-                style: ktitleStyle,
-              ),
-              SizedBox(
-                height: 15.0,
-              ),
-              Row(
-                children: [
-                  Expanded(
-                    flex: 6,
-                    child: ValueListenableBuilder<Box<Transaction>>(
-                      valueListenable: Boxes.getTransactions().listenable(),
-                      builder: (context, box, _) {
-                        List<Transaction> transactions =
-                            box.values.toList().cast<Transaction>();
+              ValueListenableBuilder<Box<Transaction>>(
+                  valueListenable: Boxes.getTransactions().listenable(),
+                  builder: (context, box, _) {
+                    List<Transaction> transactions =
+                        box.values.toList().cast<Transaction>();
 
-                        if (transactions.length == 0) {
-                          return Text(
-                            'No recent Transaction',
-                            style: ktitleStyle,
-                          );
-                        }
-                        return TransactionCard(
-                          transaction: transactions[transactions.length - 1],
-                        );
-                      },
-                    ),
-                  ),
-                  Expanded(
-                    flex: 1,
-                    child: IconButton(
-                        icon: Icon(
-                          Icons.arrow_right_alt_sharp,
-                          size: 50.0,
-                        ),
-                        onPressed: () {
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => RecentScreen()));
-                        }),
-                  )
-                ],
-              ),
+                    if (transactions.length == 0) {
+                      return SizedBox(
+                        height: 20.0,
+                      );
+                    } else {
+                      return Column(
+                        // crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          SizedBox(
+                            height: 30.0,
+                          ),
+                          Center(
+                            child: Text(
+                              'Recent Transaction',
+                              style: ktitleStyle,
+                            ),
+                          ),
+                          SizedBox(
+                            height: 15.0,
+                          ),
+                          Row(
+                            children: [
+                              Expanded(
+                                  flex: 6,
+                                  child: TransactionCard(
+                                    transaction:
+                                        transactions[transactions.length - 1],
+                                  )),
+                              Expanded(
+                                flex: 1,
+                                child: transactions.length == 0
+                                    ? SizedBox(
+                                        width: 10.0,
+                                      )
+                                    : IconButton(
+                                        icon: Icon(
+                                          Icons.arrow_right_alt_sharp,
+                                          size: 50.0,
+                                        ),
+                                        onPressed: () {
+                                          Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      RecentScreen()));
+                                        }),
+                              )
+                            ],
+                          ),
+                        ],
+                      );
+                    }
+                  }),
               SizedBox(
                 height: 70.0,
               ),

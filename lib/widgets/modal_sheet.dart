@@ -4,6 +4,8 @@ import 'package:provider/provider.dart';
 import 'package:bill_app/models/product_model.dart';
 import 'package:bill_app/providers/product_provider.dart';
 import 'package:bill_app/providers/product_operations.dart';
+import 'package:bill_app/constant.dart';
+import 'package:bill_app/api/UserSheetApi.dart';
 
 class ModalSheet extends StatefulWidget {
   final Product product;
@@ -36,8 +38,11 @@ class _ModalSheetState extends State<ModalSheet> {
       widget.product == null
           ? addProduct(name, price)
           : editProduct(product, name, price);
-      print('product aded');
       Navigator.pop(context);
+      UserSheetApi.insertData([
+        {"Product": name, "Price": price}
+      ], sheet.product);
+      print('product aded');
     }
   }
 

@@ -13,6 +13,7 @@ import 'package:pdf/pdf.dart';
 import 'package:bill_app/api/pdf_api.dart';
 import 'package:bill_app/api/pdf_invoice_api.dart';
 import 'package:bill_app/api/UserSheetApi.dart';
+import 'package:bill_app/constant.dart';
 
 class NewTransaction extends StatefulWidget {
   @override
@@ -22,19 +23,21 @@ class NewTransaction extends StatefulWidget {
 class _NewTransactionState extends State<NewTransaction> {
   @override
   Widget build(BuildContext context) {
+    final provider = Provider.of<ProductProvider>(context);
     return SafeArea(
       child: Scaffold(
         body: Stack(
           fit: StackFit.expand,
           children: [
             SearchProduct(),
-            DraggableScrollableSheet(
-                initialChildSize: 0.6,
-                minChildSize: 0.4,
-                maxChildSize: 0.8,
-                builder: (context, controller) => BillContainer(
-                      c: controller,
-                    ))
+            if (provider.productList.length != 0)
+              DraggableScrollableSheet(
+                  initialChildSize: 0.6,
+                  minChildSize: 0.4,
+                  maxChildSize: 0.8,
+                  builder: (context, controller) => BillContainer(
+                        c: controller,
+                      ))
           ],
         ),
       ),
@@ -57,18 +60,18 @@ class _BillContainerState extends State<BillContainer> {
   @override
   Widget build(BuildContext context) {
     var provider = Provider.of<ProductProvider>(context);
-
+    Size size = MediaQuery.of(context).size;
     return Container(
       padding: EdgeInsets.only(top: 10.0),
       // height: 200.0,
       width: double.infinity,
       decoration: BoxDecoration(
-          color: Color(0xFF605c5c),
+          color: Colors.black,
           borderRadius: BorderRadius.all(Radius.circular(20.0))),
       child: Column(
         children: [
           Text(
-            'Bill',
+            'Your Bill',
             style: ktitleStyle,
           ),
           SizedBox(
@@ -83,16 +86,17 @@ class _BillContainerState extends State<BillContainer> {
               child: Center(
                 child: TextFormField(
                   style:
-                      ktitleStyle.copyWith(color: Colors.black, fontSize: 30.0),
+                      ktitleStyle.copyWith(color: Colors.black, fontSize: 22.0),
                   validator: (String value) {
                     if (value.isNotEmpty) {
                       return null;
                     }
-                    return 'name is Null';
+                    return 'Please enter customer name';
                   },
                   decoration: kinputDecoration.copyWith(
-                    hintText: 'Enter name',
-                  ),
+                      contentPadding: EdgeInsets.all(8.0),
+                      hintText: 'Enter customer  name',
+                      hintStyle: TextStyle(color: Colors.grey, fontSize: 22.0)),
                   onSaved: (String value) {
                     name = value;
                   },
@@ -107,16 +111,12 @@ class _BillContainerState extends State<BillContainer> {
                 itemBuilder: (context, index) {
                   Product product = provider.productList[index];
                   print('quantity is ->${product.quantity}');
-
                   var discounted_price =
                       ((product.quantity * int.parse(product.price)) -
                               (product.quantity * int.parse(product.price)) *
                                   (product.discount / double.parse('100')))
                           .floor();
                   print('$discounted_price');
-
-                  final _formKey = GlobalKey<FormState>();
-
                   return Dismissible(
                     key: ValueKey(DateTime.now().millisecondsSinceEpoch),
                     background: Container(
@@ -156,96 +156,89 @@ class _BillContainerState extends State<BillContainer> {
                     child: Container(
                       margin: EdgeInsets.all(4),
                       padding: EdgeInsets.only(
-                          bottom: 5.0, top: 12.0, left: 12.0, right: 12.0),
+                          bottom: .0, top: 12.0, left: 12.0, right: 12.0),
                       decoration: BoxDecoration(
                           borderRadius: BorderRadius.all(Radius.circular(20.0)),
-                          color: Colors.black),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          color: Color(0xFF222222)
+                          //Color(0xFF605c5c)
+                          ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Expanded(
-                            flex: 2,
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  '${product.name}',
-                                  style: ktitleStyle.copyWith(fontSize: 25),
-                                ),
-                                SizedBox(
-                                  height: 10.0,
-                                ),
-                                Row(
-                                  children: [
-                                    Counter(
-                                      text: '${product.quantity}',
-                                      onDown: () {
-                                        product.quantity -= 1;
-                                        Provider.of<ProductProvider>(context,
-                                                listen: false)
-                                            .updateItem(index, product);
-                                      },
-                                      onUp: () {
-                                        product.quantity += 1;
-                                        Provider.of<ProductProvider>(context,
-                                                listen: false)
-                                            .updateItem(index, product);
-                                      },
-                                    ),
-                                    SizedBox(
-                                      width: 10.0,
-                                    ),
-                                    Text(
-                                      'x',
-                                      style:
-                                          ktitleStyle.copyWith(fontSize: 15.0),
-                                    ),
-                                    SizedBox(
-                                      width: 10.0,
-                                    ),
-                                    Text(
-                                      '${product.price}',
-                                      style:
-                                          ktitleStyle.copyWith(fontSize: 30.0),
-                                    ),
-                                    SizedBox(
-                                      width: 20.0,
-                                    ),
-                                    Counter(
-                                      text: '${product.discount}',
-                                      onDown: () {
-                                        product.discount -= 1;
-                                        Provider.of<ProductProvider>(context,
-                                                listen: false)
-                                            .updateItem(index, product);
-                                      },
-                                      onUp: () {
-                                        product.discount += 1;
-                                        Provider.of<ProductProvider>(context,
-                                                listen: false)
-                                            .updateItem(index, product);
-                                      },
-                                    )
-                                  ],
-                                )
-                              ],
-                            ),
+                          Text(
+                            '${product.name}',
+                            style: ktitleStyle.copyWith(fontSize: 25),
                           ),
-                          Expanded(
-                            flex: 1,
-                            child: Container(
-                                decoration: BoxDecoration(
-                                    color: Colors.purple,
-                                    borderRadius: BorderRadius.all(
-                                        Radius.circular(20.0))),
-                                padding: EdgeInsets.all(20.0),
-                                child: Text(
-                                  "₹ $discounted_price",
-                                  style: ktitleStyle.copyWith(fontSize: 20.0),
+                          Row(
+                            children: [
+                              Counter(
+                                text: '${product.quantity}',
+                                onDown: () {
+                                  if (product.quantity > 0) {
+                                    product.quantity -= 1;
+                                    Provider.of<ProductProvider>(context,
+                                            listen: false)
+                                        .updateItem(index, product);
+                                  }
+                                },
+                                onUp: () {
+                                  product.quantity += 1;
+                                  Provider.of<ProductProvider>(context,
+                                          listen: false)
+                                      .updateItem(index, product);
+                                },
+                              ),
+                              SizedBox(
+                                width: 10.0,
+                              ),
+                              Text(
+                                'x',
+                                style: ktitleStyle.copyWith(fontSize: 15.0),
+                              ),
+                              SizedBox(
+                                width: 10.0,
+                              ),
+                              Text(
+                                '${product.price}',
+                                style: ktitleStyle.copyWith(fontSize: 30.0),
+                              ),
+                              SizedBox(
+                                width: 20.0,
+                              ),
+                              Counter(
+                                text: '${product.discount}',
+                                onDown: () {
+                                  if (product.discount > 0) {
+                                    product.discount -= 1;
+                                    Provider.of<ProductProvider>(context,
+                                            listen: false)
+                                        .updateItem(index, product);
+                                  }
+                                },
+                                onUp: () {
+                                  product.discount += 3;
+                                  Provider.of<ProductProvider>(context,
+                                          listen: false)
+                                      .updateItem(index, product);
+                                },
+                              ),
+                              SizedBox(
+                                width: 10.0,
+                              ),
+                              Container(
+                                  decoration: BoxDecoration(
+                                      color: Colors.purple,
+                                      borderRadius: BorderRadius.all(
+                                          Radius.circular(20.0))),
+                                  padding: EdgeInsets.all(20.0),
+                                  child: Text(
+                                    "₹ $discounted_price",
+                                    style: ktitleStyle.copyWith(fontSize: 20.0),
 
-                                  //'${((product.discount / int.parse(product.price) * product.quantity) * 100).floor()}',
-                                )),
-                          ),
+                                    //'${((product.discount / int.parse(product.price) * product.quantity) * 100).floor()}',
+                                  )),
+                            ],
+                          )
                         ],
                       ),
                     ),
@@ -289,18 +282,20 @@ class _BillContainerState extends State<BillContainer> {
                 Navigator.pop(context);
                 PdfApi.openFile(pdfFile);
 
-                UserSheetApi.insertData(provider.productList
-                    .map((e) => {
-                          "Product": e.name,
-                          "Quantity": '${e.quantity}',
-                          "Price": e.price,
-                          "discount%": '${e.discount}',
-                          "Total":
-                              '${((e.quantity * int.parse(e.price)) - (e.quantity * int.parse(e.price)) * (e.discount / double.parse('100'))).floor()}',
-                          "Time": "$hours,$formattedDateTime",
-                          "name": name
-                        })
-                    .toList());
+                UserSheetApi.insertData(
+                    provider.productList
+                        .map((e) => {
+                              "Product": e.name,
+                              "Quantity": '${e.quantity}',
+                              "Price": e.price,
+                              "discount%": '${e.discount}',
+                              "Total":
+                                  '${((e.quantity * int.parse(e.price)) - (e.quantity * int.parse(e.price)) * (e.discount / double.parse('100'))).floor()}',
+                              "Time": "$hours,$formattedDateTime",
+                              "name": name
+                            })
+                        .toList(),
+                    sheet.transaction);
                 provider.restProvider();
               }
             },

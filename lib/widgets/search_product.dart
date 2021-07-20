@@ -19,10 +19,10 @@ class _SearchProductState extends State<SearchProduct> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: MediaQuery.of(context).size.height * 0.2,
       child: Column(
         children: [
           Container(
+            // height: MediaQuery.of(context).size.height * 0.05,
             margin: EdgeInsets.symmetric(vertical: 10.0, horizontal: 10.0),
             child: TextField(
               style: TextStyle(
@@ -30,17 +30,12 @@ class _SearchProductState extends State<SearchProduct> {
                 color: Colors.black,
               ),
               decoration: InputDecoration(
-                  contentPadding: EdgeInsets.all(10.0),
-                  suffix: Icon(
-                    Icons.search,
-                    size: 30.0,
-                    color: Colors.black,
-                  ),
+                  contentPadding: EdgeInsets.all(8.0),
                   filled: true,
                   fillColor: Colors.white,
                   hintText: 'Search for Product',
                   hintStyle: TextStyle(
-                    fontSize: 25.0,
+                    fontSize: 20.0,
                     color: Colors.black,
                   ),
                   border: OutlineInputBorder(),
@@ -53,7 +48,7 @@ class _SearchProductState extends State<SearchProduct> {
                     borderRadius: new BorderRadius.circular(20.7),
                   )),
               onChanged: (value) {
-                searchText = value;
+                searchText = value.toLowerCase();
                 setState(() {});
               },
             ),
@@ -63,7 +58,8 @@ class _SearchProductState extends State<SearchProduct> {
               builder: (context, box, _) {
                 List<Product> products = box.values.toList().cast<Product>();
                 products = products
-                    .where((element) => element.name.contains(searchText))
+                    .where((element) =>
+                        element.name.toLowerCase().contains(searchText))
                     .toList();
 
                 return Expanded(

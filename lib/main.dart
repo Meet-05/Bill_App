@@ -19,7 +19,7 @@ void main() async {
   Hive.registerAdapter(TransactionAdapter());
   await Hive.openBox<Product>('products');
   await Hive.openBox<Transaction>('transactions');
-  await UserSheetApi.init();
+  UserSheetApi.init();
 
   runApp(MyApp());
 }
@@ -33,6 +33,7 @@ class MyApp extends StatelessWidget {
       child: MaterialApp(
         themeMode: ThemeMode.dark,
         darkTheme: ThemeData(
+          fontFamily: 'Sans',
           primarySwatch: Colors.blue,
           brightness: Brightness.dark,
           /* dark theme settings */
